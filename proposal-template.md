@@ -1,69 +1,236 @@
-# Suppy Chain Management
+# Supply Chain Management
 
-_todo brief overview_
+**Blockchain-Based Cross-Border Trade Documentation and Execution Layer for
+Indian Manufacturing Exports**
+
+Merkantis proposes a permissioned blockchain platform that creates a
+decentralized, tamper-proof documentation and verification layer for
+cross-border manufacturing supply chains originating from India. The platform
+anchors every critical trade document — from RFQ to final delivery — as
+cryptographically signed, immutable records on Hyperledger Fabric, giving all
+stakeholders real-time access to a single source of truth.
+
+The solution is grounded in Merkantis's live operational experience managing
+200+ supplier engagements across India, Europe, and the Middle East.
 
 ## Problem Statement
 
-<!-- 
-  - Identify a specific problem within one of the designated domains that can be addressed using 
-    blockchain technology.
-  - Blockchain Technology has to be effectively utilized in capturing detailed work flows and 
-    transactions, across multiple stakeholders, and also implementing value-added features using 
-    other emerging technologies.
-  - Under each defined use case category, additional option is provided for the startups to submit 
-    their own idea which is unique, innovative use case, provided the startups can establish 
-    collaborations with the relevant State and/or Central Government departments who are keen to 
-    take it forward.
+<!--
+  - Identify a specific problem within one of the designated domains that can
+    be addressed using blockchain technology.
+  - Blockchain Technology has to be effectively utilized in capturing detailed
+    work flows and transactions, across multiple stakeholders, and also
+    implementing value-added features using other emerging technologies.
 -->
 
-> Blockchain technology can fundamentally transform cross-border digital trade by creating a 
-> decentralized, trusted and globally interoperable layer for the issuance, exchange and 
-> verification of critical documents such as e-Bills of Lading, Certificates of Origin, Inspection 
-> Certificates etc. By anchoring these documents as cryptographically signed, immutable records on 
-> a permissioned blockchain, all the stakeholders across the value chain can gain real-time access 
-> to a single, tamper-proof source of truth, eliminating fraud, redundancy and delays. Smart 
-> contracts can automate document workflows and compliance checks against standards, while 
-> interoperability protocols can ensure seamless cross-border recognition, integrating with 
-> national systems and global frameworks to drastically reduce transaction costs and clearance 
+> Blockchain technology can fundamentally transform cross-border digital trade
+> by creating a decentralized, trusted and globally interoperable layer for the
+> issuance, exchange and verification of critical documents such as e-Bills of
+> Lading, Certificates of Origin, Inspection Certificates etc. By anchoring
+> these documents as cryptographically signed, immutable records on a
+> permissioned blockchain, all the stakeholders across the value chain can gain
+> real-time access to a single, tamper-proof source of truth, eliminating
+> fraud, redundancy and delays. Smart contracts can automate document workflows
+> and compliance checks against standards, while interoperability protocols can
+> ensure seamless cross-border recognition, integrating with national systems
+> and global frameworks to drastically reduce transaction costs and clearance
 > times for exporters.
+
+### The Operational Reality
+
+Cross-border manufacturing sourcing from India fails not because of bad
+suppliers, but because **no intermediary owns the outcome**, and the
+documentation infrastructure is fragmented, manual, and trust-deficient.
+
+From Merkantis's direct operational experience executing cross-border component
+orders:
+
+- **Document fragmentation across 6-8 stakeholders per order.** A single export
+  order involves the manufacturer, quality inspector, freight forwarder, customs
+  broker, bank (for LC/payment), insurance provider, and the buyer's receiving
+  team. Each maintains separate records. No shared ledger exists.
+- **30-45 days average document processing time** for Indian manufacturing
+  exports. Manual verification of Certificates of Origin, Inspection
+  Certificates, material test reports, and Bills of Lading adds 2-4 weeks to
+  clearance.
+- **15-20% of Indian MSME export shipments face document discrepancies** at
+  destination ports, leading to delays, demurrage charges ($500-2,000/day for
+  containers), and disputes.
+- **No verifiable chain of custody for quality documentation.** Material test
+  certificates, dimensional inspection reports, and compliance certifications
+  are PDF files passed via email. Forgery is trivial. Verification requires
+  contacting the issuing authority manually.
+- **Duplicate financing fraud.** The same Bill of Lading can be presented to
+  multiple banks for trade finance. Indian exporters lose an estimated
+  $1.5-2B annually to trade document fraud.
+- **Communication asymmetry.** Indian suppliers quote optimistic timelines and
+  delay problem notification. There is no shared, immutable record of committed
+  milestones vs. actual delivery.
+
+These are not technology problems in isolation. They are **trust infrastructure
+problems** that blockchain is uniquely positioned to solve.
 
 ## Innovative Solution
 
-<!-- 
-  - Describe the proposed solution and how it leverages blockchain technology to address the 
-  identified problem.
-  - Develop and leverage deep tech features (eg. enhanced consensus, AI based analytics, enhanced 
-  performance, blockchain oracles, intelligent smart contracts, tokenisation etc) for permissioned 
-  blockchain, to introduce Innovation and uniqueness into the solution.
+<!--
+  - Describe the proposed solution and how it leverages blockchain technology
+    to address the identified problem.
+  - Develop and leverage deep tech features (eg. enhanced consensus, AI based
+    analytics, enhanced performance, blockchain oracles, intelligent smart
+    contracts, tokenisation etc) for permissioned blockchain, to introduce
+    Innovation and uniqueness into the solution.
 -->
 
-<!-- 
-  MerkNet: Progressive Trust Infrastructure for Cross-Border Trade
+### MerkNet: Progressive Trust Infrastructure for Cross-Border Trade
 
-  1. Progressive decentralization model — Merkantis starts as a trusted principal (buying/selling), with every transaction recorded on Fabric. As
-  on-chain history builds trust, parties graduate to direct interaction. Identity mirrors this: managed DIDs → self-sovereign nodes.
-  2. Full document lifecycle on-chain — every state from RFQ to delivery confirmation is a Fabric transaction. Manual data entry now via web/app
-  interface, architecture supports IoT data sources in future without chaincode changes.
-  3. On-chain reputation system — replaces escrow. Payment timeliness, quality acceptance rates, delivery reliability all recorded immutably. Reputation
-  determines access tier (Merkantis-intermediated vs. direct).
-  4. Rule-based compliance engine — automated validation against DGFT, destination country regs, bilateral agreements. Evolves into ML-based anomaly
-  detection as transaction data accumulates.
-  5. Smart contract payment tracking — records agreed milestones and terms, emits events on completion, records late payments on-chain. No escrow lockup,
-    but permanent accountability.
-  6. evidence anchoring — photos, test reports, inspection data hashed on-chain, stored off-chain with lifecycle management (hot → cold storage
-  post-dispute window).
-  7. DID-based supplier qualification — Indy VCs for factory certs, past performance, MSME registration. Portable reputation across the network.
--->
+MerkNet is a permissioned blockchain platform that digitizes the entire
+lifecycle of cross-border manufacturing trade — from RFQ issuance through
+final delivery and payment — creating an immutable, shared record across all
+stakeholders. Built on Hyperledger Fabric 3.0+ with SmartBFT consensus,
+FireFly middleware, and IPFS document storage.
+
+### Core Innovation Layers
+
+**1. Progressive decentralization**
+
+Merkantis starts as a trusted principal — buying from suppliers and selling to
+buyers — with every transaction recorded on Fabric. As on-chain history builds
+trust between parties, they graduate to direct interaction. The identity model
+mirrors this: new participants get a managed identity (Merkantis holds keys,
+signs on their behalf), transitioning to self-sovereign nodes (own peer, own
+keys) after the first successful deal. This eliminates the cold-start problem
+that killed TradeLens — participants don't need infrastructure to start.
+
+**2. Full document lifecycle on-chain**
+
+Unlike solutions that only anchor final static documents, MerkNet records the
+entire lifecycle: every state change from RFQ to delivery is a Fabric
+transaction.
+
+- RFQ issuance and supplier quote submission
+- Purchase order confirmation and amendment trail
+- In-process quality inspection checkpoints
+- Pre-shipment inspection reports with evidence hashes
+- Material test certificates, compliance certifications
+- Bills of Lading (e-BL as non-fungible token), Certificates of Origin
+- Customs declarations and clearance confirmations
+- Delivery receipts and acceptance/rejection records
+
+Photos, test reports, and inspection data are hashed on-chain and stored
+encrypted on IPFS. Pinned content is hot (CDN-like availability across peers);
+unpinned content remains accessible but requires retrieval from cold storage.
+UCANs (User Controlled Authorization Networks) authorize which parties can pin,
+access, and delegate access to specific documents — tied to the deal's envelope
+encryption group. Data is always accessible; pinning determines speed.
+
+Data entry is via the Merkantis web/app interface. The architecture supports
+IoT sensor data sources in future without chaincode changes — same schema,
+different signing identity.
+
+**3. On-chain reputation system**
+
+Replaces escrow (impractical for manufacturing buyers) with permanent
+accountability. Key deal milestones — PO confirmed, delivery complete, invoice
+paid — are written as hashes to the network channel, building each
+participant's verifiable history. Aggregated scores (payment timeliness, quality
+acceptance rate, delivery reliability) are computed from completed deals and
+visible to all network participants. Reputation determines access tier:
+Merkantis-intermediated for new/low-reputation participants, direct
+buyer-supplier deals for established ones.
+
+**4. Cryptographic privacy (envelope encryption + UCANs)**
+
+A two-part privacy model. Envelope encryption handles confidentiality: all deal
+data is encrypted with a per-deal AES-256 key, distributed to deal parties via
+ECIES. Structured data lives encrypted in Fabric Private Data Collections;
+documents live encrypted on IPFS. Peers on the same channel cannot read deals
+they are not party to — privacy is enforced by cryptography, not network
+topology. UCANs (User Controlled Authorization Networks) handle authorization:
+capability-based tokens control who can pin, access, and delegate access to
+IPFS documents, with delegation chains (e.g., supplier delegates read access to
+their inspector). No central authorization server required.
+
+**5. Rule-based compliance engine**
+
+Automated validation against DGFT export policies, destination country import
+regulations (CE marking, REACH, RoHS), and bilateral trade agreements. Runs as
+chaincode — results recorded on-chain, failures block document issuance with a
+documented reason. Rule definitions are stored on the network channel and
+updatable by DGFT/Customs without chaincode upgrade. Evolves into data-driven
+anomaly detection as transaction history accumulates.
+
+**6. Smart contract payment tracking**
+
+Records agreed payment milestones (e.g., 30/40/30) and tracks fulfillment.
+Chaincode emits events on milestone completion — FireFly pushes notifications
+to the buyer's finance system. Late payments are recorded on the public ledger,
+feeding the reputation system. No escrow lockup, no funds held on-chain — the
+smart contract tracks and records, it does not hold.
+
+**7. Embedded supply chain finance**
+
+A dedicated financing channel lets suppliers present verified on-chain POs and
+invoices to banks for short-term lending. Banks verify documents by hashing
+them and checking against the network channel's milestone history — instant,
+tamper-proof verification. Aligned with India's OCEN (Open Credit Enablement
+Network) framework, positioning Merkantis as a Loan Service Provider. Solves
+duplicate financing fraud: an e-BL minted as a non-fungible token on Fabric
+cannot be presented to multiple banks.
+
+**8. QR-code verification**
+
+Inspectors scan QR codes at factories to pull up inspection checklists and deal
+context. Customs house agents scan QR codes to pre-populate filing forms from
+on-chain data. Logistics providers scan to confirm pickup/delivery. QR
+verification is a hash lookup against the local peer — sub-second, works in
+low-connectivity factory and port environments. For managed-identity users who
+don't interact with the chain directly, QR is their primary interface.
+
+**9. Modular integration**
+
+MerkNet does not replace existing systems. FireFly exposes REST APIs and SDKs
+that integrate with whatever ERP, TMS, banking core, or customs system
+participants already use. The blockchain is an interoperability and trust layer,
+not a platform lock-in.
 
 ## Blockchain Applicability
 
-<!-- 
+<!--
   - Explain how blockchain technology is applicable to the identified problem.
-  - Discuss the benefits of using blockchain, such as decentralization, transparency, and 
-    immutability.
+  - Discuss the benefits of using blockchain, such as decentralization,
+    transparency, and immutability.
 -->
 
-_todo_
+### Why Blockchain is Essential for This Problem
+
+| Property | Supply Chain Pain Point | Blockchain Resolution |
+|---|---|---|
+| Decentralization | No single party trusted by all 6-8 stakeholders (buyer, supplier, bank, customs, inspector, logistics) | Shared ledger eliminates reliance on any single intermediary for document authenticity |
+| Immutability | Documents altered after issuance; certificates backdated; inspection reports modified | Every state change is a permanent, timestamped Fabric block — tampering is cryptographically impossible |
+| Smart Contracts | Payment disputes, manual compliance checks, slow document workflows | Automated milestone tracking, compliance validation, and document routing via chaincode |
+| Non-repudiation | Suppliers deny commitments; buyers dispute acceptance; timelines retroactively revised | Cryptographically signed transactions attributed to verified identities — cannot be denied post-facto |
+| Auditability | Regulators request documents from each party separately; weeks to reconstruct an order's history | DGFT and Customs audit directly from their own peer — single query, full trail, no intermediary |
+| Privacy | Commercial terms must stay confidential between deal parties while proving document legitimacy to third parties (banks, regulators) | Envelope encryption: peers on the same channel see hashes proving deals exist, but cannot read commercial data without the deal key |
+
+### Why a Database Cannot Solve This
+
+The fundamental issue is **multi-party trust across organizational and national
+boundaries**. A centralized database requires all parties to trust the database
+operator. In cross-border trade involving Indian suppliers, European buyers,
+banks in both jurisdictions, customs in multiple countries, and independent
+inspectors, no single entity commands universal trust.
+
+Merkantis itself is a stakeholder — buyers and suppliers should not have to
+trust Merkantis's database for the integrity of their documents. A permissioned
+blockchain eliminates this requirement: each party runs (or accesses) a peer
+that independently validates every transaction. Merkantis operates the network
+but cannot unilaterally alter records.
+
+Additionally, the financing use case specifically requires tamper-proof document
+verification. A bank cannot rely on a supplier's database or even Merkantis's
+database to verify a PO is legitimate. On-chain hashes on a shared ledger —
+verified by the bank's own peer — provide the trust guarantee that enables
+supply chain finance without manual verification.
 
 ## Technical Approach and Architecture
 
@@ -79,7 +246,7 @@ _todo_
 |---|---|---|
 | Consensus | SmartBFT ordering service | Shared BFT consensus across all channels |
 | Ledger | Hyperledger Fabric 3.0+ | Transactions, chaincode, world state |
-| Privacy | PDCs + Envelope Encryption | Per-deal data isolation via cryptography |
+| Privacy | PDCs + Envelope Encryption + UCANs | Per-deal data isolation via cryptography |
 | Identity | Fabric CA (ABAC) | Certificates with role attributes |
 | Middleware | Hyperledger FireFly | REST API, event bus, token management |
 | Document Storage | IPFS (encrypted) | Peer-pinned documents, content-addressed |
@@ -116,17 +283,19 @@ The network uses three Fabric channels. Privacy within channels is handled by
 Private Data Collections (PDCs) with envelope encryption, not by channel
 proliferation.
 
-**1. Network Channel**
+**1. Network Channel** (ledger-only, no documents)
 
-All participants are members (including banks). Stores:
+All participants are members (including banks). Entirely self-contained within
+the Fabric ledger — no IPFS references, no off-chain document pointers. Stores:
 
 - Identity registry (public keys, org metadata, role attributes)
 - Reputation chaincode (aggregated scores from completed deals)
 - Compliance rule definitions (DGFT export policies, destination country regs)
 - **Milestone history** — key deal events (PO confirmed, delivery complete,
-  invoice paid) are written here as hashes only (no amounts or commercial
-  details). Banks and other participants can verify document legitimacy by
-  checking hashes against this channel without accessing the trade channel.
+  invoice paid) are written here as hashes only (no amounts, no commercial
+  details, no document CIDs). Banks and other participants can verify document
+  legitimacy by hashing a document and checking against this channel without
+  accessing the trade channel.
 
 Read-heavy, write on milestone events and deal completion.
 
@@ -151,11 +320,12 @@ not be visible to buyers or other trade participants.
 ### Privacy Layer
 
 A single PDC named `tradedata` on the trade channel with broad membership.
-Access control is cryptographic via envelope encryption — not infrastructural.
+Access control is cryptographic — envelope encryption for confidentiality (who
+can read), UCANs for authorization (who can pin, access, delegate on IPFS).
 Structured deal data lives encrypted in the PDC; documents live encrypted on
 IPFS. The Fabric public ledger stores only hashes, IPFS CIDs, and deal
 metadata. See **Security, Privacy, Scalability and Performance** for the full
-encryption mechanism.
+encryption and authorization mechanism.
 
 ### Identity and Access Control
 
@@ -442,15 +612,23 @@ Fabric. Eliminates the need for custom API and indexer layers.
 
 Content-addressed distributed storage for trade documents. IPFS is a protocol
 — it has no cryptocurrency (Filecoin is a separate token layer on top; we do
-not use it).
+not use it). Every participant that runs a peer also runs an IPFS node: banks
+pin financial documents, government pins compliance documents, buyers and
+sellers pin trade documents.
 
 - Content addressing — each document's CID is derived from its hash, providing
   built-in integrity verification
-- Peer pinning — buyer and supplier IPFS nodes pin each other's deal documents
-  for redundancy without central storage
-- Access control via envelope encryption — documents are stored encrypted on
-  IPFS, only deal parties with the deal key can decrypt. IPFS itself is open;
-  cryptography enforces privacy.
+- Pinning as CDN — pinned content is hot (fast, available across peers).
+  Unpinned content remains accessible via cold retrieval. Data is always
+  available; pinning determines speed.
+- Envelope encryption — documents are stored encrypted on IPFS, only deal
+  parties with the deal key can decrypt
+- **UCANs** (User Controlled Authorization Networks) — capability-based
+  authorization tied to participant identities. UCANs control who can pin,
+  access, and delegate access to specific documents. Issued by the deal creator
+  to deal parties, with delegation chains (e.g., supplier delegates inspection
+  report access to their inspector). No central authorization server — the UCAN
+  token itself is the proof of capability.
 
 ### Alternatives Considered
 
@@ -504,13 +682,13 @@ possible.
 | # | Organization | Role | Infrastructure |
 |---|---|---|---|
 | 1 | Merkantis | Network operator, trade execution | Orderer(s) + peer(s) + FireFly + IPFS |
-| 2 | DGFT | Export licensing, compliance | Orderer + peer + FireFly |
-| 3 | Customs (CBIC) | Clearance, filing | Orderer + peer + FireFly |
-| 4 | Suppliers | Component manufacturers | Managed or own peer |
-| 5 | Buyers | Procurement entities | Managed or own peer |
+| 2 | DGFT | Export licensing, compliance | Orderer + peer + FireFly + IPFS |
+| 3 | Customs (CBIC) | Clearance, filing | Orderer + peer + FireFly + IPFS |
+| 4 | Suppliers | Component manufacturers | Managed or own peer + IPFS |
+| 5 | Buyers | Procurement entities | Managed or own peer + IPFS |
 | 6 | Quality Inspectors | Third-party or Merkantis-affiliated | Managed identity |
-| 7 | Logistics | Freight, shipping (Phase 2+) | Own peer |
-| 8 | Banks | Supply chain finance, PO/invoice verification (Phase 2+) | Orderer + peer + FireFly |
+| 7 | Logistics | Freight, shipping (Phase 2+) | Own peer + IPFS |
+| 8 | Banks | Supply chain finance, PO/invoice verification (Phase 2+) | Orderer + peer + FireFly + IPFS |
 
 ### Progressive Identity Model
 
@@ -861,10 +1039,12 @@ Threshold configs are private to each org via implicit collections.
 
 ### Privacy
 
-**Envelope encryption — the core mechanism**
+**Envelope encryption + UCANs — the two-part privacy model**
 
-All deal data is encrypted using a consistent envelope encryption pattern
-across both structured data (PDC) and documents (IPFS).
+Confidentiality (who can read) is handled by envelope encryption.
+Authorization (who can pin, access, delegate on IPFS) is handled by UCANs.
+
+**Envelope encryption:**
 
 1. Deal creator generates a random AES-256 symmetric key (the "deal key")
 2. Structured deal data (terms, pricing, milestones) is encrypted with the deal
@@ -876,6 +1056,18 @@ across both structured data (PDC) and documents (IPFS).
 5. Per-member encrypted key shares are stored in the PDC
 6. The Fabric public ledger stores only: deal ID, hash of plaintext data, IPFS
    CIDs, deal status, and member list
+
+**UCANs (User Controlled Authorization Networks):**
+
+- Deal creator issues UCAN tokens to deal parties, authorizing them to pin and
+  access specific IPFS content
+- Delegation chains: a supplier can delegate a sub-capability to their
+  inspector (e.g., read-only access to inspection reports for a specific deal)
+- No central authorization server — the UCAN token itself is cryptographic
+  proof of capability, verifiable by any IPFS node
+- Pinned content = hot (CDN-like, fast retrieval across peers). Unpinned =
+  cold (still accessible, slower retrieval). Data is always available;
+  pinning determines speed.
 
 ```
 Fabric Public Ledger (visible to all channel members):
@@ -910,8 +1102,9 @@ redistribute to remaining members.
 | Layer | What's visible | What's hidden |
 |---|---|---|
 | Public ledger | Deal exists, hash, status, members | All commercial data |
+| Network channel | Milestone hashes (no amounts/docs) | Deal details, document contents |
 | PDC | Encrypted blob on all peers | Plaintext (only deal parties decrypt) |
-| IPFS | Encrypted documents (anyone can pin) | Content (only deal parties decrypt) |
+| IPFS | Encrypted documents exist | Content (envelope encryption) + access (UCANs) |
 | ABAC | Operation was authorized | Internal org governance rules |
 
 **DPDP Act 2023 compliance**
@@ -969,9 +1162,9 @@ touch the ledger.
 |---|---|---|---|---|---|
 | Merkantis (MVP) | 1 orderer + 1 peer + CouchDB + FireFly + IPFS | 4 cores | 16 GB | 200 GB SSD | $80-150 |
 | Merkantis (growth) | 2 orderers + 2 peers + CouchDB + FireFly + IPFS | 12 cores | 32 GB | 500 GB SSD | $250-400 |
-| Government node | 1 orderer + 1 peer + CouchDB + FireFly | 4 cores | 12 GB | 200 GB SSD | $80-120 |
-| Bank node | 1 orderer + 1 peer + CouchDB + FireFly | 4 cores | 12 GB | 200 GB SSD | $80-120 |
-| Self-sovereign entity | 1 peer + CouchDB + FireFly | 2 cores | 8 GB | 100 GB SSD | $40-80 |
+| Government node | 1 orderer + 1 peer + CouchDB + FireFly + IPFS | 4 cores | 16 GB | 200 GB SSD | $80-150 |
+| Bank node | 1 orderer + 1 peer + CouchDB + FireFly + IPFS | 4 cores | 16 GB | 200 GB SSD | $80-150 |
+| Self-sovereign entity | 1 peer + CouchDB + FireFly + IPFS | 2 cores | 8 GB | 100 GB SSD | $40-80 |
 | Managed identity | Shared on Merkantis infra | — | — | — | $0 |
 
 SSD is required for CouchDB random reads (world state queries) and Fabric block
