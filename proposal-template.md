@@ -89,75 +89,66 @@ _todo_
 
 **Ordering Service (SmartBFT)**
 
-The ordering service is the shared consensus layer across all
-channels. Orderer nodes sequence transactions into blocks but
-do not store ledger data or execute chaincode. They are blind
-relays with BFT consensus.
+The ordering service is the shared consensus layer across all channels. Orderer
+nodes sequence transactions into blocks but do not store ledger data or execute
+chaincode. They are blind relays with BFT consensus.
 
 Orderer distribution:
 
-- Phase 1 (MVP): Merkantis (2 nodes) + DGFT (1) + Customs (1)
-  = 4 orderers, F=1
+- Phase 1 (MVP): Merkantis (2 nodes) + DGFT (1) + Customs (1) = 4 orderers, F=1
 - Phase 2: Add large buyer/supplier orgs = 7 orderers, F=2
 - Phase 3: Further distribution across trade partners
 
 **Peer Nodes**
 
-Each participating org runs one or more peer nodes. Peers join
-channels, store the channel ledger in CouchDB, and execute
-chaincode (endorsement). A single peer can participate in
-multiple channels.
+Each participating org runs one or more peer nodes. Peers join channels, store
+the channel ledger in CouchDB, and execute chaincode (endorsement). A single
+peer can participate in multiple channels.
 
 - Merkantis: 2 peers (HA) + FireFly + IPFS node
 - Government (DGFT, Customs): 1 peer + FireFly
 - Large suppliers/buyers (Phase 2+): 1 peer + optional FireFly
-- Small suppliers/buyers: no own infrastructure, managed
-  identity through Merkantis
+- Small suppliers/buyers: no own infrastructure, managed identity via Merkantis
 
 ### Channel Architecture
 
-The network uses two Fabric channels. Privacy within channels
-is handled by Private Data Collections (PDCs) with envelope
-encryption, not by channel proliferation.
+The network uses two Fabric channels. Privacy within channels is handled by
+Private Data Collections (PDCs) with envelope encryption, not by channel
+proliferation.
 
 **1. Network Channel**
 
 All participants are members. Stores:
 
-- Identity registry (public keys, org metadata, role
-  attributes)
+- Identity registry (public keys, org metadata, role attributes)
 - Reputation chaincode (aggregated scores from completed deals)
-- Compliance rule definitions (DGFT export policies,
-  destination country regs)
+- Compliance rule definitions (DGFT export policies, destination country regs)
 
 Read-heavy, write on deal completion or identity events.
 
 **2. Trade Channel**
 
-All active trading participants are members. All deal lifecycle
-transactions occur here. Privacy is enforced through a
-combination of PDCs and envelope encryption — the channel
-ledger contains only hashes and encrypted blobs, never
-plaintext commercial data.
+All active trading participants are members. All deal lifecycle transactions
+occur here. Privacy is enforced through a combination of PDCs and envelope
+encryption — the channel ledger contains only hashes and encrypted blobs,
+never plaintext commercial data.
 
 ### Privacy Layer
 
-A single PDC named `tradedata` on the trade channel with
-broad membership. Access control is cryptographic via envelope
-encryption — not infrastructural. Structured deal data lives
-encrypted in the PDC; documents live encrypted on IPFS. The
-Fabric public ledger stores only hashes, IPFS CIDs, and deal
-metadata. See **Security, Privacy, Scalability and
-Performance** for the full encryption mechanism.
+A single PDC named `tradedata` on the trade channel with broad membership.
+Access control is cryptographic via envelope encryption — not infrastructural.
+Structured deal data lives encrypted in the PDC; documents live encrypted on
+IPFS. The Fabric public ledger stores only hashes, IPFS CIDs, and deal
+metadata. See **Security, Privacy, Scalability and Performance** for the full
+encryption mechanism.
 
 ### Identity and Access Control
 
-Fabric CA issues X.509 certificates with embedded role
-attributes (ABAC). Chaincode checks roles before every
-operation. Government participants with existing Indian
-Digital Signature Certificates (DSCs) can use them via
-Fabric's external CA support. See **Permissioned Blockchain
-and Smart Contracts** for the full access control model.
+Fabric CA issues X.509 certificates with embedded role attributes (ABAC).
+Chaincode checks roles before every operation. Government participants with
+existing Indian Digital Signature Certificates (DSCs) can use them via Fabric's
+external CA support. See **Permissioned Blockchain and Smart Contracts** for
+the full access control model.
 
 ### Data Flow
 
@@ -255,11 +246,10 @@ Phase 3 (mature network):
   Merkantis transitions from principal to platform operator
 ```
 
-All components are containerized (Docker/Kubernetes) with
-standardized deployment templates. Managed participants share
-Merkantis infrastructure. Self-sovereign participants can
-deploy on their own infra or have Merkantis provision a cloud
-instance (as a paid service). See **Security, Privacy,
+All components are containerized (Docker/Kubernetes) with standardized
+deployment templates. Managed participants share Merkantis infrastructure.
+Self-sovereign participants can deploy on their own infra or have Merkantis
+provision a cloud instance (as a paid service). See **Security, Privacy,
 Scalability and Performance** for resource estimates.
 
 ## Benchmarking and Differentiation
@@ -285,107 +275,91 @@ _todo_
 
 **Hyperledger Fabric 3.0+** — Enterprise Ledger
 
-The core distributed ledger. Fabric is a permissioned
-blockchain with no cryptocurrency, no tokens, and no mining.
-Key properties for this use case:
+The core distributed ledger. Fabric is a permissioned blockchain with no
+cryptocurrency, no tokens, and no mining. Key properties for this use case:
 
-- **SmartBFT consensus** (new in 3.0) — Byzantine fault
-  tolerant ordering. Required because orderer nodes are run
-  by independent, mutually untrusting organizations
-  (Merkantis, DGFT, Customs). Tolerates up to F malicious
-  nodes with 3F+1 total orderers.
-- **Channels and PDCs** — two channels (network + trade) with
-  Private Data Collections for per-deal encryption. Provides
-  complete data isolation without channel proliferation.
-- **Fabric CA with ABAC** — X.509 certificate-based identity
-  with embedded role attributes. Chaincode enforces access
-  control on every operation. No separate identity layer
-  needed.
-- **Execute-order-validate** model — chaincode executes on
-  endorsing peers before transactions reach the ordering
-  service. Orderers never see plaintext transaction data,
-  only pre-endorsed proposals.
-- **Chaincode in Go** — production-grade smart contract
-  execution in isolated Docker containers.
-- **Indian government precedent** — Fabric is used in NIC
-  pilots, NITI Aayog blockchain initiatives, and is the
-  de facto standard for Indian government blockchain
-  deployments.
+- **SmartBFT consensus** (new in 3.0) — Byzantine fault tolerant ordering.
+  Required because orderer nodes are run by independent, mutually untrusting
+  organizations (Merkantis, DGFT, Customs). Tolerates up to F malicious nodes
+  with 3F+1 total orderers.
+- **Channels and PDCs** — two channels (network + trade) with Private Data
+  Collections for per-deal encryption. Provides complete data isolation without
+  channel proliferation.
+- **Fabric CA with ABAC** — X.509 certificate-based identity with embedded role
+  attributes. Chaincode enforces access control on every operation. No separate
+  identity layer needed.
+- **Execute-order-validate** model — chaincode executes on endorsing peers
+  before transactions reach the ordering service. Orderers never see plaintext
+  transaction data, only pre-endorsed proposals.
+- **Chaincode in Go** — production-grade smart contract execution in isolated
+  Docker containers.
+- **Indian government precedent** — Fabric is used in NIC pilots, NITI Aayog
+  blockchain initiatives, and is the de facto standard for Indian government
+  blockchain deployments.
 
 **Hyperledger FireFly** — Middleware
 
-A self-hosted middleware server that sits between the
-application layer and Fabric. Eliminates the need for custom
-API and indexer layers.
+A self-hosted middleware server that sits between the application layer and
+Fabric. Eliminates the need for custom API and indexer layers.
 
-- REST API gateway — any HTTP client or existing ERP system
-  can interact with the blockchain without Fabric SDK
-  knowledge
-- Event bus — real-time notifications when document states
-  change (e.g., notify buyer's finance system when a
-  milestone is hit)
-- Token connector — e-BL minted and transferred as
-  non-fungible tokens without cryptocurrency
-- Off-chain data exchange — messaging with on-chain proof
-  anchoring for large payloads
-- SDK available for participants with their own software
-  stacks (suppliers, government systems)
+- REST API gateway — any HTTP client or existing ERP system can interact with
+  the blockchain without Fabric SDK knowledge
+- Event bus — real-time notifications when document states change (e.g., notify
+  buyer's finance system when a milestone is hit)
+- Token connector — e-BL minted and transferred as non-fungible tokens without
+  cryptocurrency
+- Off-chain data exchange — messaging with on-chain proof anchoring for large
+  payloads
+- SDK available for participants with their own software stacks (suppliers,
+  government systems)
 
 **IPFS** — Document Storage
 
-Content-addressed distributed storage for trade documents.
-IPFS is a protocol — it has no cryptocurrency (Filecoin is
-a separate token layer on top; we do not use it).
+Content-addressed distributed storage for trade documents. IPFS is a protocol
+— it has no cryptocurrency (Filecoin is a separate token layer on top; we do
+not use it).
 
-- Content addressing — each document's CID is derived from
-  its hash, providing built-in integrity verification
-- Peer pinning — buyer and supplier IPFS nodes pin each
-  other's deal documents for redundancy without central
-  storage
-- Access control via envelope encryption — documents are
-  stored encrypted on IPFS, only deal parties with the
-  deal key can decrypt. IPFS itself is open; cryptography
-  enforces privacy.
+- Content addressing — each document's CID is derived from its hash, providing
+  built-in integrity verification
+- Peer pinning — buyer and supplier IPFS nodes pin each other's deal documents
+  for redundancy without central storage
+- Access control via envelope encryption — documents are stored encrypted on
+  IPFS, only deal parties with the deal key can decrypt. IPFS itself is open;
+  cryptography enforces privacy.
 
 ### Alternatives Considered
 
-**Hyperledger Fabric 2.x with Raft consensus** — Raft is
-crash fault tolerant (CFT) only. It tolerates node crashes
-but not malicious behavior. Suitable when all orderers are
-run by a single trusted org. Not suitable for MerkNet where
-orderers are distributed across Merkantis, DGFT, and Customs
-— independent entities that do not fully trust each other.
-SmartBFT (Fabric 3.0+) provides the correct Byzantine fault
-tolerant model for multi-org government-involved deployments.
+**Hyperledger Fabric 2.x with Raft consensus** — Raft is crash fault tolerant
+(CFT) only. It tolerates node crashes but not malicious behavior. Suitable when
+all orderers are run by a single trusted org. Not suitable for MerkNet where
+orderers are distributed across Merkantis, DGFT, and Customs — independent
+entities that do not fully trust each other. SmartBFT (Fabric 3.0+) provides
+the correct Byzantine fault tolerant model for multi-org government-involved
+deployments.
 
-**Hyperledger Indy** — Considered for decentralized identity
-with Verifiable Credentials and zero-knowledge proof (ZKP)
-selective disclosure. Dropped because: (a) Fabric CA with
-ABAC covers all identity and access control needs for supply
-chain — parties in a deal know each other, ZKP selective
-disclosure is unnecessary; (b) running a separate Indy
-network adds operational complexity (separate ledger,
-separate consensus, separate nodes) with no proportional
-benefit for this use case. Portable cross-platform
-credentials via Indy/Aries remain a future roadmap item.
+**Hyperledger Indy** — Considered for decentralized identity with Verifiable
+Credentials and zero-knowledge proof (ZKP) selective disclosure. Dropped
+because: (a) Fabric CA with ABAC covers all identity and access control needs
+for supply chain — parties in a deal know each other, ZKP selective disclosure
+is unnecessary; (b) running a separate Indy network adds operational complexity
+(separate ledger, separate consensus, separate nodes) with no proportional
+benefit for this use case. Portable cross-platform credentials via Indy/Aries
+remain a future roadmap item.
 
-**R3 Corda** — Designed for financial services. Lacks
-multi-channel architecture and native middleware like
-FireFly. No ABAC or built-in identity framework beyond
-basic X.509.
+**R3 Corda** — Designed for financial services. Lacks multi-channel
+architecture and native middleware like FireFly. No ABAC or built-in identity
+framework beyond basic X.509.
 
-**Hyperledger Besu / Polygon / Ethereum L2s** — Public chain
-derivatives. Even as permissioned variants, they carry
-crypto-adjacency risk with Indian regulators where
-non-crypto platforms are explicitly preferred.
+**Hyperledger Besu / Polygon / Ethereum L2s** — Public chain derivatives. Even
+as permissioned variants, they carry crypto-adjacency risk with Indian
+regulators where non-crypto platforms are explicitly preferred.
 
-**Hyperledger Sawtooth** — Deprecated; inactive community
-and limited enterprise adoption.
+**Hyperledger Sawtooth** — Deprecated; inactive community and limited enterprise
+adoption.
 
-**Cosmos SDK** — Framework for building sovereign chains.
-Significant engineering overhead and crypto-adjacent
-ecosystem (IBC, staking). Overkill for a permissioned
-enterprise deployment.
+**Cosmos SDK** — Framework for building sovereign chains. Significant
+engineering overhead and crypto-adjacent ecosystem (IBC, staking). Overkill for
+a permissioned enterprise deployment.
 
 ## Permissioned Blockchain and Smart Contracts
 
@@ -398,9 +372,9 @@ enterprise deployment.
 
 ### Network Participants
 
-Every participant is an authenticated organization with a
-Membership Service Provider (MSP) identity issued by Fabric
-CA. No anonymous participation is possible.
+Every participant is an authenticated organization with a Membership Service
+Provider (MSP) identity issued by Fabric CA. No anonymous participation is
+possible.
 
 | # | Organization | Role | Infrastructure |
 |---|---|---|---|
@@ -415,77 +389,60 @@ CA. No anonymous participation is possible.
 
 ### Progressive Identity Model
 
-New buyers and suppliers are onboarded with a **managed
-identity** — Merkantis holds their Fabric CA credentials
-and signs transactions on their behalf. Every platform
-interaction is still recorded as a Fabric transaction
-attributed to the managed identity.
+New buyers and suppliers are onboarded with a **managed identity** — Merkantis
+holds their Fabric CA credentials and signs transactions on their behalf. Every
+platform interaction is still recorded as a Fabric transaction attributed to
+the managed identity.
 
-After the first successful deal, a participant may be
-provisioned their own Fabric peer and CA credentials,
-transitioning to a **self-sovereign** identity. Merkantis
-can also provision a cloud instance for them as a paid
-service. This managed-to-self-sovereign transition mirrors
-the business model: Merkantis as principal (Phase 1) to
-Merkantis as platform operator (Phase 2+).
+After the first successful deal, a participant may be provisioned their own
+Fabric peer and CA credentials, transitioning to a **self-sovereign** identity.
+Merkantis can also provision a cloud instance for them as a paid service. This
+managed-to-self-sovereign transition mirrors the business model: Merkantis as
+principal (Phase 1) to Merkantis as platform operator (Phase 2+).
 
-Government participants with existing Indian Digital
-Signature Certificates (DSCs) — X.509 certificates issued
-by CCA-accredited authorities (eMudhra, Sify, NCode) under
-the IT Act 2000 — can use them via Fabric's external CA
+Government participants with existing Indian Digital Signature Certificates
+(DSCs) — X.509 certificates issued by CCA-accredited authorities (eMudhra,
+Sify, NCode) under the IT Act 2000 — can use them via Fabric's external CA
 support in MSP configuration.
 
 ### Access Control (ABAC)
 
-Fabric CA embeds role attributes directly in each
-participant's X.509 certificate. Chaincode enforces
-Attribute-Based Access Control (ABAC) on every operation
-by reading these attributes at invocation time.
+Fabric CA embeds role attributes directly in each participant's X.509
+certificate. Chaincode enforces Attribute-Based Access Control (ABAC) on every
+operation by reading these attributes at invocation time.
 
 **Certificate attributes:**
 
-- `role`: buyer, supplier, inspector, customs_officer,
-  logistics, merkantis_admin
+- `role`: buyer, supplier, inspector, customs_officer, logistics, merkantis_admin
 - `org`: organization MSP ID
-- `certifications`: ISO9001-auditor, DGFT-authorized,
-  CBIC-officer, etc.
+- `certifications`: ISO9001-auditor, DGFT-authorized, CBIC-officer, etc.
 
 **Chaincode access control examples:**
 
 - `SubmitRFQ` — requires `role=buyer`
-- `RespondToRFQ` — requires `role=supplier` or
-  `role=merkantis_admin`
-- `RecordInspection` — requires `role=inspector` +
-  relevant `certifications`
-- `FileCustomsDeclaration` — requires
-  `role=customs_officer`
-- `ConfirmDelivery` — requires `role=buyer` + membership
-  in the deal's PDC
-- `UpdateReputation` — system-only, triggered by deal
-  completion event
+- `RespondToRFQ` — requires `role=supplier` or `role=merkantis_admin`
+- `RecordInspection` — requires `role=inspector` + relevant `certifications`
+- `FileCustomsDeclaration` — requires `role=customs_officer`
+- `ConfirmDelivery` — requires `role=buyer` + membership in the deal's PDC
+- `UpdateReputation` — system-only, triggered by deal completion event
 
 **Endorsement policies per chaincode:**
 
-- PO confirmation: buyer peer + supplier peer +
-  Merkantis peer
+- PO confirmation: buyer peer + supplier peer + Merkantis peer
 - Inspection approval: inspector peer + buyer peer
 - Customs filing: Merkantis peer + customs peer
-- Reputation update: Merkantis peer only (reads from
-  completed deal data)
+- Reputation update: Merkantis peer only (reads from completed deal data)
 
 ### Multi-Party Signature Thresholds
 
-High-value transactions require approval from higher
-decision authorities within an organization. During
-onboarding, each org configures a decision-maker hierarchy
-(names, roles, approval thresholds).
+High-value transactions require approval from higher decision authorities
+within an organization. During onboarding, each org configures a decision-maker
+hierarchy (names, roles, approval thresholds).
 
-A `ThresholdPolicy` chaincode runs on the org's own peer
-with an org-specific endorsement policy (e.g.,
-`OR('MerkantisMSP.member')`). Threshold configuration is
-stored in the org's implicit private collection
-(`_implicit_org_<MSPID>`) — invisible to other network
-participants.
+A `ThresholdPolicy` chaincode runs on the org's own peer with an org-specific
+endorsement policy (e.g., `OR('MerkantisMSP.member')`). Threshold configuration
+is stored in the org's implicit private collection (`_implicit_org_<MSPID>`) —
+invisible to other network participants.
 
 ```
 Flow:
@@ -500,9 +457,8 @@ Flow:
    with normal multi-org endorsement
 ```
 
-This keeps governance rules private to each org while
-ensuring the final Fabric transaction is properly
-authorized. Self-sovereign participants configure their
+This keeps governance rules private to each org while ensuring the final Fabric
+transaction is properly authorized. Self-sovereign participants configure their
 own thresholds in their own implicit collection.
 
 ### Smart Contract Suite
@@ -562,8 +518,7 @@ Triggers:
 
 **3. DocumentManagement** (trade channel)
 
-Handles trade documents as tokens via FireFly's token
-connector.
+Handles trade documents as tokens via FireFly's token connector.
 
 ```
 States:
@@ -584,8 +539,8 @@ an authorized party (ABAC-enforced).
 
 **4. PaymentTracking** (trade channel)
 
-Records agreed milestones and tracks payment status.
-Does not hold funds or implement escrow.
+Records agreed milestones and tracks payment status. Does not hold funds or
+implement escrow.
 
 ```
 States:
@@ -681,92 +636,82 @@ _todo_
 
 **Consensus-level protection (SmartBFT)**
 
-The ordering service tolerates up to F Byzantine (malicious)
-nodes with 3F+1 total orderers. Phase 1 deploys 4 orderers
-(F=1) across Merkantis, DGFT, and Customs. Phase 2 expands
-to 7 orderers (F=2) with additional independent orgs. No
-single org can unilaterally manipulate transaction ordering.
+The ordering service tolerates up to F Byzantine (malicious) nodes with 3F+1
+total orderers. Phase 1 deploys 4 orderers (F=1) across Merkantis, DGFT, and
+Customs. Phase 2 expands to 7 orderers (F=2) with additional independent orgs.
+No single org can unilaterally manipulate transaction ordering.
 
 **Identity and authentication**
 
-All network participants hold X.509 certificates issued by
-Fabric CA with embedded role attributes (ABAC). No anonymous
-participation. Government participants with existing Indian
-Digital Signature Certificates (DSCs) — issued by
-CCA-accredited authorities under the IT Act 2000 — can use
-them directly via Fabric's external CA support, reusing
-India's existing digital signature infrastructure for
-network authentication.
+All network participants hold X.509 certificates issued by Fabric CA with
+embedded role attributes (ABAC). No anonymous participation. Government
+participants with existing Indian Digital Signature Certificates (DSCs) —
+issued by CCA-accredited authorities under the IT Act 2000 — can use them
+directly via Fabric's external CA support, reusing India's existing digital
+signature infrastructure for network authentication.
 
 **Mutual TLS (mTLS)**
 
-All peer-to-peer and client-to-peer communication is
-mTLS-encrypted. Unlike standard HTTPS where only the server
-authenticates, mTLS requires both sides to present and
-verify certificates. Every connection between orderers,
-peers, and clients is mutually authenticated using the same
-X.509 / DSC certificates used for transaction signing.
+All peer-to-peer and client-to-peer communication is mTLS-encrypted. Unlike
+standard HTTPS where only the server authenticates, mTLS requires both sides to
+present and verify certificates. Every connection between orderers, peers, and
+clients is mutually authenticated using the same X.509 / DSC certificates used
+for transaction signing.
 
 **Execute-order-validate model**
 
-Fabric's transaction pipeline ensures orderers never see
-plaintext transaction data. Chaincode executes on endorsing
-peers, producing a signed read-write set. The ordering
-service only sequences these pre-endorsed proposals into
-blocks — it cannot read or modify transaction content.
+Fabric's transaction pipeline ensures orderers never see plaintext transaction
+data. Chaincode executes on endorsing peers, producing a signed read-write set.
+The ordering service only sequences these pre-endorsed proposals into blocks —
+it cannot read or modify transaction content.
 
 **Key management**
 
-- Orderer signing keys: HSM-backed (cloud HSM in cloud
-  deployments — AWS CloudHSM, Azure Dedicated HSM; or
-  hardware appliance such as YubiHSM for on-prem nodes)
+- Orderer signing keys: HSM-backed (cloud HSM in cloud deployments — AWS
+  CloudHSM, Azure Dedicated HSM; or hardware appliance such as YubiHSM for
+  on-prem nodes)
 - CA root key: HSM-backed
-- Peer and participant keys: software-based encrypted-at-rest
-  key stores, upgradeable to HSM
-- On-prem deployment option: locked-down Linux appliance
-  with integrated HSM chip, shipped as plug-and-play hardware
-  to participants who require on-premises infrastructure
+- Peer and participant keys: software-based encrypted-at-rest key stores,
+  upgradeable to HSM
+- On-prem deployment option: locked-down Linux appliance with integrated HSM
+  chip, shipped as plug-and-play hardware to participants who require
+  on-premises infrastructure
 
 **Chaincode isolation**
 
-All chaincode executes in isolated Docker containers on
-endorsing peers. A compromised chaincode cannot access peer
-state outside its designated channel and collections.
+All chaincode executes in isolated Docker containers on endorsing peers. A
+compromised chaincode cannot access peer state outside its designated channel
+and collections.
 
 **Immutable audit trail**
 
-Every state change is a Fabric block committed to all
-channel peers. Regulators (DGFT, Customs) audit directly
-from their own peer — no data requests needed, no
-intermediary involved.
+Every state change is a Fabric block committed to all channel peers. Regulators
+(DGFT, Customs) audit directly from their own peer — no data requests needed,
+no intermediary involved.
 
 **Multi-party signature thresholds**
 
-High-value transactions require additional internal
-approvals via the ThresholdPolicy chaincode (see
-Permissioned Blockchain and Smart Contracts). Threshold
-configs are private to each org via implicit collections.
+High-value transactions require additional internal approvals via the
+ThresholdPolicy chaincode (see Permissioned Blockchain and Smart Contracts).
+Threshold configs are private to each org via implicit collections.
 
 ### Privacy
 
 **Envelope encryption — the core mechanism**
 
-All deal data is encrypted using a consistent envelope
-encryption pattern across both structured data (PDC) and
-documents (IPFS).
+All deal data is encrypted using a consistent envelope encryption pattern
+across both structured data (PDC) and documents (IPFS).
 
-1. Deal creator generates a random AES-256 symmetric key
-   (the "deal key")
-2. Structured deal data (terms, pricing, milestones) is
-   encrypted with the deal key and stored in the PDC
-3. Documents (PDFs, images, test reports) are encrypted
-   with the same deal key and stored on IPFS
-4. The deal key is encrypted separately with each group
-   member's public key using ECIES (Elliptic Curve
-   Integrated Encryption Scheme)
+1. Deal creator generates a random AES-256 symmetric key (the "deal key")
+2. Structured deal data (terms, pricing, milestones) is encrypted with the deal
+   key and stored in the PDC
+3. Documents (PDFs, images, test reports) are encrypted with the same deal key
+   and stored on IPFS
+4. The deal key is encrypted separately with each group member's public key
+   using ECIES (Elliptic Curve Integrated Encryption Scheme)
 5. Per-member encrypted key shares are stored in the PDC
-6. The Fabric public ledger stores only: deal ID, hash of
-   plaintext data, IPFS CIDs, deal status, and member list
+6. The Fabric public ledger stores only: deal ID, hash of plaintext data, IPFS
+   CIDs, deal status, and member list
 
 ```
 Fabric Public Ledger (visible to all channel members):
@@ -790,11 +735,11 @@ IPFS (encrypted, pinned by deal parties):
   encrypted(inspection_report.pdf)
 ```
 
-**Adding a party** (e.g., customs joins a deal): encrypt the
-deal key with their public key and append to encrypted_keys.
+**Adding a party** (e.g., customs joins a deal): encrypt the deal key with their
+public key and append to encrypted_keys.
 
-**Revoking access**: re-encrypt all deal data with a new deal
-key and redistribute to remaining members.
+**Revoking access**: re-encrypt all deal data with a new deal key and
+redistribute to remaining members.
 
 **Privacy guarantees at each layer:**
 
@@ -808,45 +753,38 @@ key and redistribute to remaining members.
 **DPDP Act 2023 compliance**
 
 - Data minimization: only hashes on shared ledger, no PII
-- Consent management at application layer (Merkantis
-  platform)
-- Right to erasure: off-chain data (IPFS, PDC) can be
-  deleted; on-chain hashes are non-personal and do not
-  constitute personal data
-- Key destruction: deleting all copies of the deal key
-  renders encrypted data permanently unreadable even if
-  the ciphertext persists
+- Consent management at application layer (Merkantis platform)
+- Right to erasure: off-chain data (IPFS, PDC) can be deleted; on-chain hashes
+  are non-personal and do not constitute personal data
+- Key destruction: deleting all copies of the deal key renders encrypted data
+  permanently unreadable even if the ciphertext persists
 
 ### Scalability
 
 **Channel architecture**
 
-The network uses two channels (network + trade) rather than
-per-deal or per-participant-pair channels. This keeps channel
-management overhead constant regardless of deal volume. PDCs
-scale cheaply — they are access-controlled data entries
-within a channel, not separate ledgers.
+The network uses two channels (network + trade). This keeps channel management
+overhead constant regardless of deal volume. PDCs scale cheaply — they are
+access-controlled data entries within a channel, not separate ledgers.
 
 **Vertical scaling**
 
-A single Fabric peer's throughput exceeds projected order
-volume by orders of magnitude (see Performance below).
-Vertical scaling (larger VM) is the primary scaling lever
-for individual nodes.
+A single Fabric peer's throughput exceeds projected order volume by orders of
+magnitude (see Performance below). Vertical scaling (larger VM) is the primary
+scaling lever for individual nodes.
 
 **Redundant peers for availability**
 
-Merkantis runs 2 peers in Phase 2+ for high availability.
-If one peer goes down, the other continues serving. This is
-replica redundancy, not data sharding — both peers hold
-identical ledger state. The 3F+1 formula applies to orderers
-only; peers can be added freely without affecting consensus.
+Merkantis runs 2 peers in Phase 2+ for high availability. If one peer goes
+down, the other continues serving. This is replica redundancy, not data
+sharding — both peers hold identical ledger state. The 3F+1 formula applies to
+orderers only; peers can be added freely without affecting consensus.
 
 **Off-chain processing**
 
-FireFly handles API caching, event indexing, and data
-exchange off-chain. IPFS stores documents independently of
-Fabric. Only hashes and state transitions touch the ledger.
+FireFly handles API caching, event indexing, and data exchange off-chain. IPFS
+stores documents independently of Fabric. Only hashes and state transitions
+touch the ledger.
 
 **Projected volume and capacity:**
 
@@ -871,24 +809,21 @@ Fabric. Only hashes and state transitions touch the ledger.
 | Self-sovereign entity | 1 peer + CouchDB + FireFly | 2 cores | 8 GB | 100 GB SSD | $40-80 |
 | Managed identity | Shared on Merkantis infra | — | — | — | $0 |
 
-SSD is required for CouchDB random reads (world state
-queries) and Fabric block commits. All components run as
-Docker containers — deployable on any cloud provider
-(AWS, Azure, GCP, Hetzner, Linode) or locally for
-development and demos.
+SSD is required for CouchDB random reads (world state queries) and Fabric block
+commits. All components run as Docker containers — deployable on any cloud
+provider (AWS, Azure, GCP, Hetzner, Linode) or locally for development and
+demos.
 
 ### Performance
 
-Fabric 3.0 with SmartBFT benchmarks at ~3,000 TPS. A
-cross-border manufacturing order generates ~100-300
-transactions over its multi-week lifecycle. Even at 1,000
-concurrent orders, peak throughput demand is ~5-10 TPS —
-well within a single peer's capacity.
+Fabric 3.0 with SmartBFT benchmarks at ~3,000 TPS. A cross-border
+manufacturing order generates ~100-300 transactions over its multi-week
+lifecycle. Even at 1,000 concurrent orders, peak throughput demand is ~5-10 TPS
+— well within a single peer's capacity.
 
-Document verification (hash lookup against the ledger) is
-sub-second. IPFS retrieval of encrypted documents depends
-on network conditions but is typically under 5 seconds for
-pinned content.
+Document verification (hash lookup against the ledger) is sub-second. IPFS
+retrieval of encrypted documents depends on network conditions but is typically
+under 5 seconds for pinned content.
 
 ## Execution Plan
 
@@ -942,26 +877,41 @@ _todo_
 
 ### Business Model
 
-- **Transaction fee**: per-order fee for blockchain anchoring and smart contract execution
+- **Transaction fee**: per-order fee for blockchain anchoring and smart contract
+  execution
 - **Subscription**: monthly access for suppliers/buyers based on volume tier
-- **Managed infrastructure**: Merkantis provisions and operates cloud instances for self-sovereign participants who prefer not to manage their own nodes (paid service)
-- **Analytics and intelligence**: subscription access to aggregated supplier performance data, predictive analytics, and benchmarking — built on Merkantis's proprietary dataset from transaction history. This is a Merkantis product layer on top of the network, not a blockchain feature.
-- **Government licensing**: platform-as-a-service for state trade facilitation bodies
+- **Managed infrastructure**: Merkantis provisions and operates cloud instances
+  for self-sovereign participants who prefer not to manage their own nodes
+  (paid service)
+- **Analytics and intelligence**: subscription access to aggregated supplier
+  performance data, predictive analytics, and benchmarking — built on
+  Merkantis's proprietary dataset from transaction history. This is a Merkantis
+  product layer on top of the network, not a blockchain feature.
+- **Government licensing**: platform-as-a-service for state trade facilitation
+  bodies
 
 ### Market Size
 
 - India's merchandise exports: $437B (FY2024)
 - MSME contribution to exports: ~45% ($197B)
 - Cross-border trade documentation market (India): estimated $2-3B annually
-- Addressable market for MerkNet (precision manufacturing exports): $500M+ in documentation and trade facilitation services
+- Addressable market for MerkNet (precision manufacturing exports): $500M+ in
+  documentation and trade facilitation services
 
 ### Why Merkantis is Uniquely Positioned
 
-1. **Live operational data from 200+ cross-border engagements** — the platform digitizes workflows Merkantis already runs manually, not theoretical processes
-2. **Existing supplier network** in Coimbatore, Bangalore, and Chennai manufacturing clusters — pilot-ready on day one
-3. **Active buyer relationships in Europe** (Switzerland, Germany) — demand-side validation
-4. **Domain expertise in precision manufacturing** — understands the specific documentation, quality, and compliance requirements that generic blockchain platforms miss
-5. **Cross-border entity structure** (India + Switzerland) — firsthand understanding of the regulatory landscape on both sides
+1. **Live operational data from 200+ cross-border engagements** — the platform
+   digitizes workflows Merkantis already runs manually, not theoretical
+   processes
+2. **Existing supplier network** in Coimbatore, Bangalore, and Chennai
+   manufacturing clusters — pilot-ready on day one
+3. **Active buyer relationships in Europe** (Switzerland, Germany) — demand-side
+   validation
+4. **Domain expertise in precision manufacturing** — understands the specific
+   documentation, quality, and compliance requirements that generic blockchain
+   platforms miss
+5. **Cross-border entity structure** (India + Switzerland) — firsthand
+   understanding of the regulatory landscape on both sides
 
 ### Potential Partnerships
 
@@ -973,11 +923,22 @@ _todo_
 
 ### Future Roadmap
 
-- **IoT integration**: factory-floor sensors with own Fabric CA identities writing directly to the trade channel via FireFly API. Same chaincode, same schema — signing identity changes from person to device. Architecture is ready; adoption depends on factory digitization.
-- **Portable credentials via Hyperledger Indy/Aries**: supplier certifications and performance attestations as Verifiable Credentials that travel across platforms and buyers. Enables cross-network reputation portability.
-- **Bank integration**: trade finance instruments (LCs, bank guarantees) as on-chain workflows with partner banks. Payment milestones trigger automated finance events.
-- **Multi-corridor expansion**: India-EU → India-UAE → India-US → India-Africa trade corridors
-- **Data-driven compliance evolution**: as transaction history accumulates, rule-based compliance engine evolves to incorporate ML-based anomaly detection (flagging statistically improbable quality claims, timeline commitments inconsistent with historical data)
+- **IoT integration**: factory-floor sensors with own Fabric CA identities
+  writing directly to the trade channel via FireFly API. Same chaincode, same
+  schema — signing identity changes from person to device. Architecture is
+  ready; adoption depends on factory digitization.
+- **Portable credentials via Hyperledger Indy/Aries**: supplier certifications
+  and performance attestations as Verifiable Credentials that travel across
+  platforms and buyers. Enables cross-network reputation portability.
+- **Bank integration**: trade finance instruments (LCs, bank guarantees) as
+  on-chain workflows with partner banks. Payment milestones trigger automated
+  finance events.
+- **Multi-corridor expansion**: India-EU → India-UAE → India-US → India-Africa
+  trade corridors
+- **Data-driven compliance evolution**: as transaction history accumulates,
+  rule-based compliance engine evolves to incorporate ML-based anomaly
+  detection (flagging statistically improbable quality claims, timeline
+  commitments inconsistent with historical data)
 
 ## Signature and Team Information
 
