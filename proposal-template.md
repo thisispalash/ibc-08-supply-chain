@@ -96,7 +96,7 @@ chaincode. They are blind relays with BFT consensus.
 Orderer distribution:
 
 - Phase 1 (MVP): Merkantis (2 nodes) + DGFT (1) + Customs (1) = 4 orderers, F=1
-- Phase 2: Add large buyer/supplier orgs = 7 orderers, F=2
+- Phase 2: Add banks + large buyer/supplier orgs = 7 orderers, F=2
 - Phase 3: Further distribution across trade partners
 
 **Peer Nodes**
@@ -112,19 +112,23 @@ peer can participate in multiple channels.
 
 ### Channel Architecture
 
-The network uses two Fabric channels. Privacy within channels is handled by
+The network uses three Fabric channels. Privacy within channels is handled by
 Private Data Collections (PDCs) with envelope encryption, not by channel
 proliferation.
 
 **1. Network Channel**
 
-All participants are members. Stores:
+All participants are members (including banks). Stores:
 
 - Identity registry (public keys, org metadata, role attributes)
 - Reputation chaincode (aggregated scores from completed deals)
 - Compliance rule definitions (DGFT export policies, destination country regs)
+- **Milestone history** — key deal events (PO confirmed, delivery complete,
+  invoice paid) are written here as hashes only (no amounts or commercial
+  details). Banks and other participants can verify document legitimacy by
+  checking hashes against this channel without accessing the trade channel.
 
-Read-heavy, write on deal completion or identity events.
+Read-heavy, write on milestone events and deal completion.
 
 **2. Trade Channel**
 
@@ -132,6 +136,17 @@ All active trading participants are members. All deal lifecycle transactions
 occur here. Privacy is enforced through a combination of PDCs and envelope
 encryption — the channel ledger contains only hashes and encrypted blobs,
 never plaintext commercial data.
+
+**3. Financing Channel** (Phase 2+)
+
+Banks and financial institutions participate alongside Merkantis and entities
+seeking financing. Suppliers present POs or invoices to banks for short-term
+lending (supply chain finance). Banks verify document legitimacy by hashing the
+submitted document and checking it against the network channel — instant,
+tamper-proof verification without accessing the trade channel. Loan terms,
+disbursement, and repayment are recorded on this channel. Separated from the
+trade channel because loan terms (interest rates, repayment schedules) should
+not be visible to buyers or other trade participants.
 
 ### Privacy Layer
 
@@ -189,10 +204,12 @@ the full access control model.
 8. Order acceptance → PO recorded on Fabric
    → payment terms chaincode activated
    → milestones defined in PDC
+   → PO hash written to network channel (milestone history)
 
 9. Manufacturing + quality checkpoints
-   → inspector/factory worker enters data via Merkantis
-     interface
+   → inspector scans QR code at factory → pulls up
+     inspection checklist and deal context
+   → enters data via Merkantis interface
    → recorded on Fabric, encrypted in deal PDC
    → [Future: IoT sensors with own Fabric CA identity
      write directly via FireFly API — same chaincode,
@@ -207,17 +224,21 @@ the full access control model.
     → e-BL minted as token via FireFly token connector
     → customs node added to deal PDC (deal key encrypted
       with customs pubkey)
+    → CHA scans QR → pre-populates customs filing forms
+      from on-chain deal data
     → rule-based compliance checks against DGFT/destination
       regs
 
 12. Delivery + acceptance/rejection
     → buyer confirms via platform
     → recorded on Fabric
+    → delivery hash written to network channel
 
 13. Payment milestone tracking
     → chaincode emits events on milestone completion
     → FireFly pushes to buyer's finance system
     → late payments recorded on public ledger
+    → payment hash written to network channel
 
 14. Deal completion → reputation update
     → deal chaincode emits completion event
@@ -254,13 +275,117 @@ Scalability and Performance** for resource estimates.
 
 ## Benchmarking and Differentiation
 
-<!-- 
+<!--
   - Compare the proposed solution with existing solutions.
-  - Highlight the differentiation factors, such as unique features, improved efficiency, or 
-    enhanced security.
+  - Highlight the differentiation factors, such as unique features, improved
+    efficiency, or enhanced security.
 -->
 
-_todo_
+### Comparable Solutions
+
+| Dimension | TradeLens | Marco Polo | CargoX | Govt Pilots | MerkNet |
+|---|---|---|---|---|---|
+| Status | Defunct (2022) | Defunct (2023) | Active | Pilot only | Proposed |
+| Scope | Shipping only | Trade finance | e-BL only | Single-dept PoC | Full lifecycle: RFQ → delivery → payment |
+| Stakeholders | Carriers, ports | Banks | Customs, shippers | Single govt entity | 6-8 per transaction |
+| Manufacturing | None | None | None | None | QC workflow, inspection anchoring |
+| India-specific | No | No | No | Yes but narrow | 200+ India supplier engagements |
+| Privacy model | Channel isolation | Need-to-know | Public chain | Basic | Envelope encryption + PDCs |
+| Identity | Platform accounts | Bank KYC | Wallet-based | Aadhaar-linked | Fabric CA + ABAC + DSC support |
+| Onboarding | Required own node | Bank-mediated | Wallet setup | Govt-provisioned | Managed identity, zero infra |
+| Supply chain finance | None | Bank-to-bank only | None | None | OCEN-aligned, on-chain PO/invoice verification |
+| Platform | Fabric 1.x | Corda | Ethereum | Fabric | Fabric 3.0+ SmartBFT |
+
+**TradeLens (Maersk/IBM)** — shut down November 2022. Covered shipping and
+logistics only. Failed partly because it required participants to run their own
+infrastructure and couldn't convince Maersk's competitors to join a
+Maersk-controlled network.
+
+**Marco Polo (R3 Corda)** — shut down late 2023. Trade finance only
+(bank-to-bank). No document lifecycle, no manufacturing integration. Never
+bridged the gap between trade execution and trade finance.
+
+**CargoX** — active, used by Egyptian customs (NAFEZA) for electronic Bill of
+Lading. Covers e-BL only, not the full trade lifecycle. Built on Ethereum
+(public chain) — carries crypto-adjacency concerns.
+
+**Indian government pilots (NIC/NITI Aayog)** — small-scale proofs of concept.
+Single-department, narrow scope, not multi-stakeholder.
+
+**Raymond x Spydra** — product identity on Fabric, 15M assets tokenized for
+Raymond textiles. QR-based ownership tracking and counterfeit detection. Focused
+on product authentication, not cross-border trade documentation.
+
+### Key Differentiators
+
+**1. Operational-first, not tech-first**
+
+Merkantis already executes cross-border manufacturing orders daily. The
+blockchain layer digitizes existing workflows, not theoretical ones. The pain
+points — document fragmentation, verification delays, trust gaps — come from
+200+ real engagements, not market research.
+
+**2. Full lifecycle coverage**
+
+No existing solution covers RFQ through quality verification through shipping
+through payment in a single platform. TradeLens covered shipping. Marco Polo
+covered finance. Both missed the manufacturing and quality layer where trust
+actually breaks down. MerkNet captures the entire order lifecycle from first
+inquiry to final payment.
+
+**3. Progressive decentralization**
+
+Managed identities for zero-friction onboarding on day one; self-sovereign
+nodes as trust builds. TradeLens failed partly because it required participants
+to run infrastructure upfront. MerkNet removes that barrier entirely — new
+participants interact via the Merkantis platform with no blockchain knowledge or
+infrastructure required.
+
+**4. Cryptographic privacy beyond channel isolation**
+
+Envelope encryption means peers on the same channel cannot read deals they are
+not party to. This is stronger than TradeLens's channel-based privacy (all
+channel members see everything) or Corda's need-to-know model. Privacy is
+enforced by cryptography, not by network topology.
+
+**5. Modular integration, not platform lock-in**
+
+MerkNet does not compete with existing ERP, TMS, or banking systems. FireFly
+exposes REST APIs and SDKs that integrate with whatever systems participants
+already use. A supplier's existing ERP can push data to the chain; a bank's
+core system can query deal status; customs systems can pull compliance data.
+The blockchain is an interoperability layer, not a replacement for anything.
+
+**6. Embedded supply chain finance**
+
+Unlike platforms that separate trade execution from trade finance, MerkNet's
+financing channel lets banks verify POs and invoices directly against on-chain
+records — hash lookup, instant, tamper-proof. Aligned with India's OCEN (Open
+Credit Enablement Network) framework, positioning Merkantis as a Loan Service
+Provider that connects suppliers with lenders using verified on-chain data.
+Neither TradeLens nor Marco Polo achieved this bridge.
+
+**7. MSME-accessible**
+
+Designed for India's 63M+ MSMEs, not just large corporates. Zero-infrastructure
+onboarding via managed identities. QR-code-based verification for quick
+document lookups by customs house agents, inspectors, and logistics providers.
+Mobile-first interfaces for factory-floor data entry.
+
+**8. India supplier intelligence**
+
+Proprietary dataset from 200+ engagements: actual vs. quoted lead times, defect
+rates, communication responsiveness. This feeds the compliance and analytics
+layer and cannot be replicated by a new entrant without years of operational
+work in the same trade corridors.
+
+**9. IoT-ready architecture**
+
+The chaincode and FireFly API layer are designed so that IoT sensors on the
+factory floor can write directly to the trade channel using their own Fabric CA
+identities — same schema, same validation, different signing identity. When
+Indian manufacturing facilities adopt IoT (an ongoing trend), MerkNet is ready
+without architectural changes.
 
 ## Non-Crypto Blockchain Platform
 
@@ -282,9 +407,9 @@ cryptocurrency, no tokens, and no mining. Key properties for this use case:
   Required because orderer nodes are run by independent, mutually untrusting
   organizations (Merkantis, DGFT, Customs). Tolerates up to F malicious nodes
   with 3F+1 total orderers.
-- **Channels and PDCs** — two channels (network + trade) with Private Data
-  Collections for per-deal encryption. Provides complete data isolation without
-  channel proliferation.
+- **Channels and PDCs** — three channels (network, trade, financing) with
+  Private Data Collections for per-deal encryption. Provides complete data
+  isolation without channel proliferation.
 - **Fabric CA with ABAC** — X.509 certificate-based identity with embedded role
   attributes. Chaincode enforces access control on every operation. No separate
   identity layer needed.
@@ -385,7 +510,7 @@ possible.
 | 5 | Buyers | Procurement entities | Managed or own peer |
 | 6 | Quality Inspectors | Third-party or Merkantis-affiliated | Managed identity |
 | 7 | Logistics | Freight, shipping (Phase 2+) | Own peer |
-| 8 | Banks | Trade finance (Phase 2+) | Own peer |
+| 8 | Banks | Supply chain finance, PO/invoice verification (Phase 2+) | Orderer + peer + FireFly |
 
 ### Progressive Identity Model
 
@@ -413,7 +538,7 @@ operation by reading these attributes at invocation time.
 
 **Certificate attributes:**
 
-- `role`: buyer, supplier, inspector, customs_officer, logistics, merkantis_admin
+- `role`: buyer, supplier, inspector, customs_officer, logistics, bank_officer, merkantis_admin
 - `org`: organization MSP ID
 - `certifications`: ISO9001-auditor, DGFT-authorized, CBIC-officer, etc.
 
@@ -425,6 +550,8 @@ operation by reading these attributes at invocation time.
 - `FileCustomsDeclaration` — requires `role=customs_officer`
 - `ConfirmDelivery` — requires `role=buyer` + membership in the deal's PDC
 - `UpdateReputation` — system-only, triggered by deal completion event
+- `RequestFinancing` — requires `role=supplier` or `role=merkantis_admin`
+- `VerifyDocument` — requires `role=bank_officer` (hash check on network channel)
 
 **Endorsement policies per chaincode:**
 
@@ -463,7 +590,7 @@ own thresholds in their own implicit collection.
 
 ### Smart Contract Suite
 
-Six chaincode packages deployed across the two channels.
+Seven chaincode packages deployed across the three channels.
 
 **1. DealLifecycle** (trade channel)
 
@@ -590,10 +717,20 @@ updatable by DGFT/Customs without chaincode upgrade.
 
 **6. Reputation** (network channel)
 
-Aggregates performance metrics from completed deals.
+Aggregates performance metrics and records milestone history.
 
 ```
-Inputs (from deal completion events):
+Milestone history writes:
+  Key deal events are written to the network channel as
+  hashes (no amounts or commercial details):
+  - PO_CONFIRMED: hash of PO document
+  - DELIVERY_COMPLETE: hash of delivery confirmation
+  - INVOICE_PAID: hash of payment record
+  These hashes allow banks and other participants to
+  verify document legitimacy without accessing the
+  trade channel.
+
+Reputation inputs (from deal completion events):
   - Payment timeliness (on-time vs. late, from
     PaymentTracking)
   - Quality acceptance rate (approved vs. rejected,
@@ -612,6 +749,33 @@ Output:
 Reputation scores determine access tier:
   - Low reputation → Merkantis-intermediated only
   - High reputation → direct buyer-supplier deals
+```
+
+**7. SupplyChainFinance** (financing channel)
+
+Manages loan lifecycle for supply chain finance. Aligned with India's OCEN
+(Open Credit Enablement Network) framework — Merkantis acts as a Loan
+Service Provider connecting suppliers with bank lenders using verified
+on-chain data.
+
+```
+States:
+  FINANCING_REQUESTED
+  → VERIFIED (bank hashes submitted PO/invoice,
+    checks against network channel milestone history)
+  → TERMS_OFFERED (bank proposes loan terms)
+  → TERMS_ACCEPTED (supplier accepts)
+  → DISBURSED (loan amount released)
+  → REPAID | DEFAULTED
+
+The bank monitors the network channel for deal
+milestones as risk signals — but these are
+informational, not triggers. The loan lifecycle is
+independent of payment tracking on the trade channel.
+When buyer pays supplier (visible as a milestone hash
+on network channel), the bank knows the supplier has
+funds to repay, but repayment terms and schedule are
+governed by the loan agreement on this channel.
 ```
 
 ## Regulatory Framework
@@ -763,9 +927,9 @@ redistribute to remaining members.
 
 **Channel architecture**
 
-The network uses two channels (network + trade). This keeps channel management
-overhead constant regardless of deal volume. PDCs scale cheaply — they are
-access-controlled data entries within a channel, not separate ledgers.
+The network uses three channels (network, trade, financing). This keeps channel
+management overhead constant regardless of deal volume. PDCs scale cheaply —
+they are access-controlled data entries within a channel, not separate ledgers.
 
 **Vertical scaling**
 
@@ -806,6 +970,7 @@ touch the ledger.
 | Merkantis (MVP) | 1 orderer + 1 peer + CouchDB + FireFly + IPFS | 4 cores | 16 GB | 200 GB SSD | $80-150 |
 | Merkantis (growth) | 2 orderers + 2 peers + CouchDB + FireFly + IPFS | 12 cores | 32 GB | 500 GB SSD | $250-400 |
 | Government node | 1 orderer + 1 peer + CouchDB + FireFly | 4 cores | 12 GB | 200 GB SSD | $80-120 |
+| Bank node | 1 orderer + 1 peer + CouchDB + FireFly | 4 cores | 12 GB | 200 GB SSD | $80-120 |
 | Self-sovereign entity | 1 peer + CouchDB + FireFly | 2 cores | 8 GB | 100 GB SSD | $40-80 |
 | Managed identity | Shared on Merkantis infra | — | — | — | $0 |
 
@@ -821,9 +986,12 @@ manufacturing order generates ~100-300 transactions over its multi-week
 lifecycle. Even at 1,000 concurrent orders, peak throughput demand is ~5-10 TPS
 — well within a single peer's capacity.
 
-Document verification (hash lookup against the ledger) is sub-second. IPFS
-retrieval of encrypted documents depends on network conditions but is typically
-under 5 seconds for pinned content.
+Document verification (hash lookup against the ledger) is sub-second. QR-code
+verification — scanning a QR to check a document's on-chain status — is the
+same hash lookup, sub-second, and works in low-connectivity environments
+(factory floors, port areas) since it's a lightweight query against the local
+peer. IPFS retrieval of encrypted documents depends on network conditions but is
+typically under 5 seconds for pinned content.
 
 ## Execution Plan
 
@@ -887,6 +1055,9 @@ _todo_
   performance data, predictive analytics, and benchmarking — built on
   Merkantis's proprietary dataset from transaction history. This is a Merkantis
   product layer on top of the network, not a blockchain feature.
+- **Supply chain finance facilitation**: Merkantis as OCEN-aligned Loan Service
+  Provider — banks pay per-verification or subscription fee for access to
+  on-chain PO/invoice verification via the financing channel
 - **Government licensing**: platform-as-a-service for state trade facilitation
   bodies
 
@@ -916,7 +1087,7 @@ _todo_
 ### Potential Partnerships
 
 - **ICEGATE / NIC** — customs integration for electronic filing
-- **Indian banks (SBI, ICICI)** — trade finance module (Phase 2+)
+- **Indian banks (SBI, ICICI)** — financing channel partners, orderer nodes (Phase 2+)
 - **CODISSIA** (Coimbatore District Small Industries Association) — supplier onboarding at scale
 - **Swiss-Indian Chamber of Commerce (SICC)** — cross-border trade corridor validation
 - **CII / FICCI** — pan-India industry rollout through association partnerships
@@ -930,9 +1101,9 @@ _todo_
 - **Portable credentials via Hyperledger Indy/Aries**: supplier certifications
   and performance attestations as Verifiable Credentials that travel across
   platforms and buyers. Enables cross-network reputation portability.
-- **Bank integration**: trade finance instruments (LCs, bank guarantees) as
-  on-chain workflows with partner banks. Payment milestones trigger automated
-  finance events.
+- **Advanced trade finance**: LCs, bank guarantees, and multi-bank syndication
+  as on-chain workflows. The financing channel provides the foundation; advanced
+  instruments build on top.
 - **Multi-corridor expansion**: India-EU → India-UAE → India-US → India-Africa
   trade corridors
 - **Data-driven compliance evolution**: as transaction history accumulates,
