@@ -958,12 +958,145 @@ governed by the loan agreement on this channel.
 
 ## Regulatory Framework
 
-<!-- 
-  - Discuss how the proposed solution complies with the regulatory framework of the domain.
+<!--
+  - Discuss how the proposed solution complies with the regulatory framework
+    of the domain.
   - Highlight any relevant laws, regulations, or standards.
 -->
 
-_todo_
+### Indian Regulatory Compliance
+
+**Information Technology Act, 2000 (amended 2008)**
+
+Blockchain-anchored documents qualify as electronic records under Section 4.
+Digital signatures on Fabric transactions are recognized under Section 5.
+Electronic records are admissible as evidence under Section 65B of the Indian
+Evidence Act. Fabric's immutable audit trail provides a superior evidentiary
+chain compared to email/PDF-based documentation.
+
+**Bills of Lading Act, 2025**
+
+Enacted August 2025, replacing the 169-year-old 1856 Act. Provides **full
+legal recognition to electronic Bills of Lading (e-BLs)**, including
+blockchain-based e-BLs, electronic signatures, and digital delivery orders.
+MerkNet's e-BL implementation — minted as a non-fungible token via FireFly's
+token connector with endorsement chain preserved in token metadata — aligns
+directly with this Act. Note: the Central Government must still notify specific
+technical rules for e-BL platforms; MerkNet is architecturally ready to comply
+once these rules are published.
+
+**Carriage of Goods by Sea Act, 2025**
+
+Also enacted August 2025, replacing the 1925 Act. Aligns India with
+Hague-Visby Rules and elements of the Hamburg Rules. Modernizes carrier
+liability and multimodal transport documentation — the legal foundation for
+digitizing shipping documents on-chain.
+
+**Foreign Trade Policy 2025**
+
+Explicitly includes digital trade infrastructure and **blockchain security for
+trade records**. MerkNet directly implements this vision by providing a
+blockchain-backed verification layer for export documentation.
+
+**Customs Act, 1962 / ICEGATE**
+
+ICEGATE (Indian Customs EDI Gateway) handles electronic customs filing,
+e-SANCHIT (electronic document submission), and e-payment. MerkNet integrates
+with ICEGATE via FireFly's REST API — compliance chaincode validates documents
+before submission, and QR-code-based pre-population streamlines CHA workflows.
+
+**Foreign Exchange Management Act (FEMA)**
+
+Trade finance and cross-border payment flows comply with RBI guidelines on
+trade credit. The financing channel operates within FEMA's framework for
+short-term trade credit and supplier financing.
+
+**RBI Digital Lending Directions, 2025**
+
+Issued May 2025, providing a unified regulatory framework for all digital
+lending by RBI-regulated entities. MerkNet's financing channel, with Merkantis
+acting as a Loan Service Provider (LSP) connecting suppliers with bank lenders,
+must comply with these Directions — including mandatory Key Fact Statements,
+loan disbursement directly to borrower accounts, and LSP fee transparency.
+
+**TReDS (Trade Receivables Discounting System)**
+
+RBI-regulated platform for MSME receivables financing (5 approved platforms).
+MerkNet's financing channel is complementary, not competing: TReDS handles
+receivables discounting specifically, while MerkNet enables PO/invoice-based
+lending backed by on-chain verification of deal status and document
+legitimacy. The two can coexist — a bank could use TReDS for receivables and
+MerkNet for PO-based pre-shipment finance.
+
+**OCEN (Open Credit Enablement Network)**
+
+Industry-led open protocol (iSPIRT Foundation, OCEN 4.0) for standardized
+lending APIs between LSPs and lenders. Merkantis positions as an OCEN-aligned
+LSP — the financing channel's APIs can implement OCEN's consent management,
+loan origination, and disbursement flows. OCEN operates within RBI's regulatory
+perimeter via alignment with the Account Aggregator (AA) framework and Digital
+Lending Directions.
+
+**Digital Personal Data Protection Act, 2023**
+
+- Data minimization: only hashes on shared ledger, no PII
+- Consent management at application layer (Merkantis platform)
+- Right to erasure: off-chain data (IPFS, PDC) can be deleted; on-chain hashes
+  are non-personal data
+- Key destruction: deleting all copies of the deal key renders encrypted data
+  permanently unreadable
+- Cross-border transfers: DPDPA uses a blacklist approach (data flows to any
+  country except those restricted by the Central Government; no restricted list
+  published yet)
+
+### International Regulatory Compliance
+
+**GDPR (EU General Data Protection Regulation)**
+
+Applies extraterritorially since MerkNet processes personal data of EU-based
+buyers. The architecture aligns with EDPB Guidelines 02/2025 on processing
+personal data through blockchain technologies:
+
+- On-chain: only salted/keyed cryptographic hashes (the EDPB notes these are
+  still considered personal data under GDPR, but if the off-chain record is
+  deleted and the hash becomes "disconnected," this may satisfy right to
+  erasure)
+- Off-chain: all PII stored encrypted in PDCs/IPFS with envelope encryption
+- Key destruction serves as the erasure mechanism — rendering ciphertext
+  permanently unreadable
+- Clear controller/processor agreements between Indian (Merkantis) and European
+  entities
+
+Both GDPR and DPDPA apply simultaneously to different data subjects and flows
+on the platform.
+
+**UNCITRAL MLETR (Model Law on Electronic Transferable Records)**
+
+India has not formally ratified MLETR. However, India's Bills of Lading Act
+2025 achieves similar outcomes through sector-specific legislation — legal
+recognition of e-BLs, electronic signatures, and digital delivery orders.
+MerkNet's e-BL implementation follows MLETR principles (singularity, integrity,
+reliability of the system) for future interoperability with jurisdictions that
+have adopted MLETR (Singapore, UK, Bahrain, Abu Dhabi).
+
+**ICC Digital Standards Initiative**
+
+Document schemas aligned with ICC standards for trade documentation. Ensures
+interoperability with global trade platforms and banking systems that follow
+ICC's digital trade standards.
+
+**WCO Data Model**
+
+Customs data aligned with World Customs Organization standards for
+cross-border interoperability. Relevant for ICEGATE integration and
+destination country customs systems.
+
+**WTO Trade Facilitation Agreement (TFA), Article 10**
+
+MerkNet effectively implements a digital single window — all stakeholders
+access a shared source of truth for trade documents. This aligns with TFA
+Article 10's requirement for single window facilities that allow traders to
+submit documentation through a single entry point.
 
 ## Security, Privacy, Scalability and Performance
 
@@ -1206,14 +1339,116 @@ _todo_
 
 ## Government Department Collaboration
 
-<!-- 
-  - Identify the government departments with which the startup plans to collaborate.
-  - Explain how the proposed solution is relevant to these departments and how it can benefit them.
-  - Define a viable Business Model and plan for a Wider Proliferation Strategy across India for 
-    different states and UTs.
+<!--
+  - Identify the government departments with which the startup plans to
+    collaborate.
+  - Explain how the proposed solution is relevant to these departments and how
+    it can benefit them.
+  - Define a viable Business Model and plan for a Wider Proliferation Strategy
+    across India for different states and UTs.
 -->
 
-_todo_
+### Target Departments
+
+**1. Directorate General of Foreign Trade (DGFT)**
+
+Primary collaboration partner. DGFT governs export licensing, IEC issuance, and
+trade policy enforcement. MerkNet directly supports India's National Trade
+Facilitation Action Plan and DGFT's digitization mandate. DGFT runs an orderer
+node (strengthening consensus) and a peer node (direct access to compliance
+data and audit trails). The compliance chaincode validates against DGFT export
+policies in real time — rule definitions on the network channel are updatable
+by DGFT without chaincode upgrades.
+
+**2. Central Board of Indirect Taxes and Customs (CBIC)**
+
+ICEGATE integration for electronic customs filing. Blockchain-anchored
+documents reduce clearance time and document discrepancy rates. CHA agents use
+QR codes to pre-populate filing forms from on-chain data. CBIC runs an orderer
+node and a peer node — direct audit access to all trade channel transactions
+relevant to customs compliance.
+
+**3. Ministry of MSME**
+
+MerkNet directly serves India's 63M+ MSMEs. Zero-infrastructure onboarding via
+managed identities removes the technology barrier for small manufacturers. The
+financing channel enables MSME suppliers to access short-term lending backed by
+verified on-chain POs — addressing the working capital gap that constrains
+MSME export growth. Aligns with MSME Champions scheme and export promotion
+programs.
+
+**4. Ministry of Electronics and Information Technology (MeitY)**
+
+Challenge organizer. MerkNet contributes to the National Blockchain Technology
+Stack. Built entirely on Hyperledger (Fabric + FireFly) — the de facto
+standard for Indian government blockchain deployments. Architecture is modular,
+API-first, and replicable across domains.
+
+**5. Reserve Bank of India (RBI)**
+
+The financing channel operates within RBI's Digital Lending Directions 2025.
+MerkNet complements TReDS (Trade Receivables Discounting System) by enabling
+PO/invoice-based pre-shipment finance — a segment TReDS does not cover. Banks
+participating as orderer nodes strengthen network security while gaining direct
+access to verified trade data for lending decisions. OCEN-aligned API design
+ensures interoperability with RBI's digital lending ecosystem.
+
+**6. State Industries Departments (Tamil Nadu, Karnataka, Maharashtra)**
+
+Pilot deployment in Coimbatore, Bangalore, and Pune manufacturing clusters.
+Direct alignment with state export promotion policies and district-level
+industrial development programs. State departments benefit from transparent
+audit trails of export activity originating in their jurisdictions.
+
+### Relevant Government Schemes
+
+**Trade Infrastructure for Export Scheme (TIES)**
+
+Operational through FY 2025-26. Provides grant-in-aid up to Rs 20 crore per
+project to Central/State government agencies for export infrastructure. MerkNet
+qualifies as digital trade facilitation infrastructure — blockchain-based
+documentation, verification, and compliance automation for export processes.
+
+**Districts as Export Hubs**
+
+734 districts identified with export potential; 590 have District Export Action
+Plans (DEAP). MerkNet serves as the digital backbone connecting district-level
+manufacturing clusters to cross-border buyers with blockchain-verified
+documentation. Natural alignment with DEAP execution — each district's
+manufacturing MSMEs can onboard via managed identities with zero infrastructure
+requirements.
+
+**Market Access Initiative (MAI)**
+
+Supports exporters with market access, trade promotion, and capacity building.
+Could fund pilot deployments, awareness campaigns, and onboarding drives for
+blockchain-based export documentation in target manufacturing clusters.
+
+**Foreign Trade Policy 2025**
+
+Explicitly includes digital trade infrastructure and blockchain security for
+trade records. MerkNet is a direct implementation of this policy vision.
+
+### Wider Proliferation Strategy
+
+1. **State-by-state rollout** starting with manufacturing-heavy states
+   (Tamil Nadu, Karnataka, Maharashtra, Gujarat) through state industry
+   department partnerships and alignment with District Export Action Plans
+2. **Integration with existing government platforms** — ICEGATE for customs,
+   GeM for procurement, Udyam portal for MSME registration verification.
+   FireFly's API-first architecture means integration without replacing any
+   existing system.
+3. **Industry association partnerships** — CII, FICCI, CODISSIA, and state
+   chambers of commerce for supplier onboarding at scale. Associations can
+   run awareness campaigns; onboarding is frictionless (managed identity, no
+   infrastructure).
+4. **Multi-corridor expansion**: India-EU (current Merkantis corridor) →
+   India-UAE → India-US → India-Africa trade corridors. Each corridor adds
+   destination country customs/regulatory nodes to the network.
+5. **Open API ecosystem**: FireFly REST APIs and SDKs enable third-party
+   developers to build on the platform — inspection apps, logistics
+   integrations, finance products, analytics tools. The blockchain layer is
+   infrastructure, not a walled garden.
 
 ## Additional Details
 
